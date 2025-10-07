@@ -7,19 +7,27 @@ class LZ77:
 
     def decompress(self):
         """Decompress the input using LZ77 algorithm."""
+        user_input = input("Enter compressed triples like <0,0,A> <0,0,B> <2,9,>\n=> ")
+    
+        compressed_data = []
+        for part in user_input.split():
+            part = part.strip("<>")
+            pos, length, char = part.split(",")
+            pos = int(pos)
+            length = int(length)
+            compressed_data.append((pos, length, char))
+    
         output = ""
-
-        for position, length, next_char in input:
+        for position, length, next_char in compressed_data:
             if position == 0 and length == 0:
-                """ Just a literal character"""
                 output += next_char
             else:
-                """ Copy substring from decompressed data"""
                 start = len(output) - position
                 for i in range(length):
                     output += output[start + i]
                 output += next_char
 
-        return output
+    print("\nDecompressed text:", output)
+    return output
         
 
