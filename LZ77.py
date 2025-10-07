@@ -27,7 +27,7 @@ class LZ77:
                     output += output[start + i]
                 output += next_char
 
-    print("\nDecompressed text:", output)
-    return output
+        print("\nDecompressed text:", output)
+        return output
         
 
