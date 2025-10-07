@@ -46,3 +46,7 @@ class LZ77:
 
         else:
             print("Invalid choice! Please enter 'c' or 'd'.")
+
+if __name__ == "__main__":
+    program = LZ77("")
+    program.menu()
