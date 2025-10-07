@@ -1,10 +1,11 @@
 import LZ77 as cp
 
 while True:
-    data=input('Welcome to LZ77\n\nCould you enter the text : ')
-    compressor=cp.LZ77(data)
+    print('Welcome to LZ77\n')
 
-    choice=input("What would you like to do ?\n1.Compress\n2.decompress\n3.Exit")
+    choice=input("What would you like to do ?\n1.Compress\n2.decompress\n3.Exit\n")
+
+    compressor = cp.LZ77("")
 
     if choice=='1':
         compressor.compress()
