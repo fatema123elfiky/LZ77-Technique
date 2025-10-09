@@ -11,16 +11,18 @@ class LZ77:
 
     def Stringify(self,Tags):
         """Stringify is taking list of tuples and print them in the way of tags and return a string of tags
+        @:parameter list of tuples of tags
+        @:return string of tags
         """
         StringifiedTags = ""
         for Tag in Tags:
-            StringifiedTags+=(f"<{Tag[0]},{Tag[1]},{Tag[2]}>\n")
+            StringifiedTags+=(f"<{Tag[0]},{Tag[1]},{Tag[2]}> ")
         return StringifiedTags
 
     def Compressor(self):
         """Compress the input using LZ77 algorithm.
         @:parameter empty
-        @:return list of tags
+        @:return list of tuples of tags
         """
         data=input("Enter data to be compressed: ")
         CompressedData = []
@@ -33,9 +35,10 @@ class LZ77:
         LeftS, RightS = 0, 0
         self.LookAheadWindow=data[LeftA:RightA]
         self.SearchWindow=data[LeftS:RightS]
+
         Sequence = ""
         Sequence+=(self.LookAheadWindow[0])
-        print(f"Noe seq : {Sequence} , idx : {LeftA} ")
+
 
         while (LeftA<len(data)) and len(self.LookAheadWindow) :
 
@@ -50,65 +53,48 @@ class LZ77:
                 if(LeftA<RightA):
                     Sequence+=(self.LookAheadWindow[LeftA-startOfSequence])
 
-            if Found :
 
-                LeftA+=1
-                if (RightA < len(data)):
-                    RightA += 1
-                if(LeftA<RightA):
-                    self.LookAheadWindow=data[LeftA:RightA]
-                else:
-                    self.LookAheadWindow=[]
-                # forloop to get the position and add to tag
-                NextSymbol =Sequence[-1]
-                Sequence=Sequence[:-1]
+            #LookAhead updates
+            LeftA+=1
+            if (RightA < len(data)):
+                RightA += 1
+            if(LeftA<RightA):
+                self.LookAheadWindow=data[LeftA:RightA]
+            else:
+                self.LookAheadWindow=[]
+
+            # forloop to get the position and add to tags
+            NextSymbol =Sequence[-1]
+            Sequence=Sequence[:-1]
+
+            if Found :
                 Pos=-1
                 for idx in range(LeftS,RightS):
                     if(Sequence == self.SearchWindow[ idx:( idx+len(Sequence) ) ]):
                         Pos=max(idx,Pos)
 
                 tag = tuple((startOfSequence-Pos,len(Sequence),NextSymbol))
-                CompressedData.append(tag)
-
-                Sequence=""
-                if(len(self.LookAheadWindow)):
-                    Sequence += self.LookAheadWindow[0]
-                else :
-                    break
-
-                # part of changing search buffer
-                if (LeftA - LeftS <= len(data)):
-                    RightS = LeftA
-                else:
-                    RightS = LeftA
-                    LeftS = RightS-self.size
-
-                self.SearchWindow = data[LeftS:RightS]
-
             else :
-                LeftA += 1
-                if (RightA < len(data)):
-                    RightA += 1
-                if(LeftA<RightA):
-                    self.LookAheadWindow = data[LeftA:RightA]
-                NextSymbol = Sequence[-1]
-                Sequence = Sequence[:-1]
-                tag = tuple((0,0,NextSymbol))
-                Sequence = ""
-                if(len(self.LookAheadWindow)):
-                    Sequence += self.LookAheadWindow[0]
-                else :
-                    break
+                tag = tuple((0, 0, NextSymbol))
+            CompressedData.append(tag)
 
-                CompressedData.append(tag)
+            #update the new sequence
+            Sequence=""
+            if(len(self.LookAheadWindow)):
+                Sequence += self.LookAheadWindow[0]
+            else :
+                break
 
-                if (LeftA - LeftS <= len(data)):
-                    RightS = LeftA
-                else:
-                    RightS = LeftA
-                    LeftS = RightS - self.size
+            # part of changing search buffer
+            if (LeftA - LeftS <= len(data)):
+                RightS = LeftA
+            else:
+                RightS = LeftA
+                LeftS = RightS-self.size
 
-                self.SearchWindow = data[LeftS:RightS]
+            self.SearchWindow = data[LeftS:RightS]
+
+
 
 
         return CompressedData
