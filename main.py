@@ -1,7 +1,7 @@
 import LZ77 as cp
 
 while True:
-    print('Welcome to LZ77\n')
+    print('Welcome to LZ77')
 
     choice = input("What would you like to do ?\n1.Compress\n2.Decompress\n3.Exit\n")
 
@@ -17,3 +17,4 @@ while True:
         break
     else:
         print('Invalid choice')
+    print()

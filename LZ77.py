@@ -25,73 +25,64 @@ class LZ77:
         @:return list of tuples of tags
         """
         data = input("Enter data to be compressed: ")
-        CompressedData = []
+        compressedData = []
 
         if len(data) < self.size:
             self.size = len(data)
 
-        LeftA, RightA = 0, self.size
-        LeftS, RightS = 0, 0
-        self.LookAheadWindow = data[LeftA:RightA]
-        self.SearchWindow = data[LeftS:RightS]
+        leftAhead, rightAhead = 0, self.size
+        leftSearch, rightSearch = 0, 0
+        self.LookAheadWindow = data[leftAhead: rightAhead]
+        self.SearchWindow = data[leftSearch: rightSearch]
 
-        Sequence = ""
-        Sequence += (self.LookAheadWindow[0])
+        while (leftAhead < len(data)) and len(self.LookAheadWindow):
 
-        while (LeftA < len(data)) and len(self.LookAheadWindow):
+            longest = 0
+            posOfLongest = 0
 
-            startOfSequence = LeftA
-            found = False
+            # Try to go back to every pos in the search window
+            for pos in range(1, len(self.SearchWindow)+1):
 
-            while (Sequence in self.SearchWindow) and (LeftA < RightA):
-                found = True
-                LeftA += 1
-                if RightA < len(data):
-                    RightA += 1
-                if LeftA < RightA:
-                    Sequence += (self.LookAheadWindow[LeftA - startOfSequence])
+                currentIdx = len(self.SearchWindow) - pos
 
-            # LookAhead updates
-            LeftA += 1
-            if RightA < len(data):
-                RightA += 1
-            if LeftA < RightA:
-                self.LookAheadWindow = data[LeftA:RightA]
+                length = 0
+                while length < len(self.LookAheadWindow):
+
+                    if currentIdx + length < len(self.SearchWindow):
+                        c = self.SearchWindow[currentIdx + length]
+                    else:
+                        c = self.LookAheadWindow[length - (len(self.SearchWindow) - currentIdx)]
+
+                    if c != self.LookAheadWindow[length]:
+                        break
+                    length += 1
+
+                if length > longest:
+                    longest = length
+                    posOfLongest = pos
+
+            nextSymbol = ""
+            if longest < len(self.LookAheadWindow):
+                nextSymbol = self.LookAheadWindow[longest]
+
+            if longest > 0:
+                tag = tuple((posOfLongest, longest, nextSymbol))
+                leftAhead += longest + 1
             else:
-                self.LookAheadWindow = []
+                tag = tuple((0, 0, nextSymbol))
+                leftAhead += 1
 
-            # For loop to get the position and add to tags
-            NextSymbol = Sequence[-1]
-            Sequence = Sequence[:-1]
+            compressedData.append(tag)
 
-            if found:
-                Pos = -1
-                for idx in range(LeftS, RightS):
-                    if Sequence == self.SearchWindow[idx:(idx + len(Sequence))]:
-                        Pos = max(idx, Pos)
+            # Update the Search and Look-Ahead buffers
+            rightAhead = min(len(data), leftAhead + self.size)
+            rightSearch = leftAhead
+            leftSearch = max(0, rightSearch - self.size)
 
-                tag = tuple((startOfSequence - Pos, len(Sequence), NextSymbol))
-            else:
-                tag = tuple((0, 0, NextSymbol))
-            CompressedData.append(tag)
+            self.SearchWindow = data[leftSearch:rightSearch]
+            self.LookAheadWindow = data[leftAhead:rightAhead]
 
-            # Update the new sequence
-            Sequence = ""
-            if len(self.LookAheadWindow):
-                Sequence += self.LookAheadWindow[0]
-            else:
-                break
-
-            # Part of changing search buffer
-            if LeftA - LeftS <= len(data):
-                RightS = LeftA
-            else:
-                RightS = LeftA
-                LeftS = RightS - self.size
-
-            self.SearchWindow = data[LeftS:RightS]
-
-        return CompressedData
+        return compressedData
 
     def decompress(self):
         """Decompress the input using LZ77 algorithm.
