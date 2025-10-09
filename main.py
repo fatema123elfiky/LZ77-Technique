@@ -5,10 +5,11 @@ while True:
 
     choice=input("What would you like to do ?\n1.Compress\n2.decompress\n3.Exit\n")
 
-    compressor = cp.LZ77("")
+    compressor = cp.LZ77()
 
     if choice=='1':
-        compressor.compress()
+        Tags=compressor.Compressor()
+        print(compressor.Stringify(Tags))
     elif choice=='2' :
         compressor.decompress()
     elif choice=='3' :
